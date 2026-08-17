@@ -2,61 +2,65 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🌾 3D Ферма - расти и собирай</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🌾 3D Ферма - сенсорное управление</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
             font-family: 'Segoe UI', Tahoma, sans-serif;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         #info {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.7);
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.75);
             color: #fff;
-            padding: 12px 24px;
+            padding: 10px 18px;
             border-radius: 40px;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
             border: 1px solid #ffd966;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
             pointer-events: none;
             z-index: 10;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: clamp(0.8rem, 2.5vw, 1.1rem);
         }
         #coinDisplay {
             background: #f5c542;
             color: #1d2f1a;
-            padding: 4px 16px;
+            padding: 2px 14px;
             border-radius: 40px;
-            font-size: 1.2rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             box-shadow: inset 0 -3px 0 #a77d2a;
         }
         #levelDisplay {
             background: #3c6b3a;
-            padding: 4px 16px;
+            padding: 2px 14px;
             border-radius: 40px;
-            font-size: 1rem;
             border: 1px solid #a9c97a;
         }
         #ui {
             position: absolute;
-            bottom: 30px;
+            bottom: 20px;
             left: 0;
             right: 0;
             display: flex;
             justify-content: center;
-            gap: 16px;
+            gap: clamp(8px, 2vw, 20px);
             flex-wrap: wrap;
-            padding: 0 16px;
+            padding: 0 12px;
             z-index: 20;
             pointer-events: none;
         }
@@ -64,9 +68,9 @@
             pointer-events: auto;
             background: #faf3d7;
             border: none;
-            padding: 14px 32px;
+            padding: clamp(12px, 2.5vw, 18px) clamp(20px, 4vw, 36px);
             border-radius: 60px;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
             font-weight: 700;
             color: #1d3a12;
             box-shadow: 0 6px 0 #6d8756, 0 8px 24px rgba(0,0,0,0.4);
@@ -74,10 +78,12 @@
             transition: 0.06s linear;
             display: inline-flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             border: 1px solid #e7d990;
-            min-width: 140px;
+            min-width: clamp(100px, 20vw, 160px);
             justify-content: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         #ui button:active {
             transform: translateY(6px);
@@ -89,57 +95,56 @@
             box-shadow: 0 2px 0 #6d8756;
             pointer-events: none;
         }
+        #resetBtn {
+            background: #d6c29a;
+            box-shadow: 0 6px 0 #7b6d48;
+        }
         #message {
             position: absolute;
-            bottom: 110px;
+            bottom: clamp(80px, 15vw, 120px);
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(10, 20, 5, 0.8);
-            backdrop-filter: blur(6px);
+            background: rgba(10, 20, 5, 0.85);
+            backdrop-filter: blur(8px);
             color: #f5f0c0;
-            padding: 10px 28px;
+            padding: clamp(8px, 1.5vw, 14px) clamp(16px, 3vw, 32px);
             border-radius: 60px;
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 2vw, 1.1rem);
             border: 1px solid #d4c97a;
             white-space: nowrap;
             z-index: 15;
             font-weight: 500;
             letter-spacing: 0.3px;
             pointer-events: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        }
-        #crosshair {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: rgba(255,255,200,0.3);
-            font-size: 2.4rem;
-            pointer-events: none;
-            z-index: 5;
-            text-shadow: 0 0 12px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         @media (max-width: 600px) {
-            #info { font-size: 0.8rem; padding: 8px 16px; gap: 10px; flex-wrap: wrap; }
-            #ui button { padding: 10px 16px; font-size: 1rem; min-width: 100px; }
-            #message { font-size: 0.8rem; padding: 6px 16px; bottom: 100px; white-space: normal; }
+            #message { white-space: normal; bottom: clamp(70px, 18vw, 100px); }
+            #info { gap: 8px; padding: 6px 14px; }
+        }
+        @media (orientation: landscape) and (max-height: 500px) {
+            #ui { bottom: 10px; gap: 6px; }
+            #ui button { padding: 8px 16px; font-size: 0.9rem; min-width: 80px; }
+            #message { bottom: 60px; font-size: 0.7rem; padding: 4px 12px; }
+            #info { top: 6px; left: 6px; padding: 4px 12px; font-size: 0.7rem; }
         }
     </style>
 </head>
 <body>
     <div id="info">
-        <span>🪙 <span id="coinCounter">20</span></span>
-        <span id="levelDisplay">🌱 Уровень 1</span>
+        <span id="coinDisplay">🪙 <span id="coinCounter">20</span></span>
+        <span id="levelDisplay">🌱 Ур. <span id="levelCounter">1</span></span>
     </div>
-    <div id="crosshair">+</div>
-    <div id="message">🌾 Наведись на клетку и нажми "Посадить"</div>
+    <div id="message">🌾 Нажми на грядку, затем кнопку</div>
     <div id="ui">
         <button id="plantBtn">🌿 Посадить</button>
         <button id="harvestBtn">🧺 Собрать</button>
-        <button id="resetBtn" style="background:#d6c29a; box-shadow:0 6px 0 #7b6d48;">🔄 Сброс</button>
+        <button id="resetBtn">🔄 Сброс</button>
     </div>
 
-    <!-- Подключаем Three.js и доп. библиотеки -->
     <script type="importmap">
         {
             "imports": {
@@ -163,19 +168,19 @@
         const OFFSET = (GRID_SIZE - 1) * CELL_SIZE / 2;
 
         // --- Состояние ---
-        let cells = []; // { stage: 0,1,2, timer: null, mesh: null, label: null }
+        let cells = [];
         let coins = 20;
         let level = 1;
         let selectedIndex = null;
         let raycaster = new THREE.Raycaster();
-        let mouse = new THREE.Vector2();
+        let touchPos = new THREE.Vector2();
 
         // --- DOM ---
         const coinSpan = document.getElementById('coinCounter');
-        const levelSpan = document.getElementById('levelDisplay');
+        const levelSpan = document.getElementById('levelCounter');
         const messageEl = document.getElementById('message');
 
-        // --- Сцена, камера, рендеры ---
+        // --- Сцена ---
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x87CEEB);
         scene.fog = new THREE.Fog(0x87CEEB, 20, 40);
@@ -186,6 +191,7 @@
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(renderer.domElement);
@@ -198,20 +204,24 @@
         labelRenderer.domElement.style.pointerEvents = 'none';
         document.body.appendChild(labelRenderer.domElement);
 
-        // --- Управление (камера) ---
+        // --- Управление с поддержкой тач ---
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.target.set(0, 1.2, 0);
         controls.enableDamping = true;
         controls.dampingFactor = 0.08;
-        controls.maxPolarAngle = Math.PI / 2.4;
-        controls.minDistance = 4;
-        controls.maxDistance = 18;
+        controls.maxPolarAngle = Math.PI / 2.3;
+        controls.minDistance = 3.5;
+        controls.maxDistance = 16;
+        controls.touchRotate = true;
+        controls.touchZoom = true;
+        controls.touchPan = false;
+        controls.enablePan = true;
+        controls.panSpeed = 0.5;
         controls.update();
 
         // --- Освещение ---
         const ambient = new THREE.AmbientLight(0x404c38, 0.6);
         scene.add(ambient);
-
         const sun = new THREE.DirectionalLight(0xfff5d1, 1.2);
         sun.position.set(10, 18, 6);
         sun.castShadow = true;
@@ -224,15 +234,13 @@
         sun.shadow.camera.top = 10;
         sun.shadow.camera.bottom = -10;
         scene.add(sun);
-
         const fill = new THREE.DirectionalLight(0xc4e0ff, 0.4);
         fill.position.set(-8, 4, -6);
         scene.add(fill);
-
         const hemi = new THREE.HemisphereLight(0x87CEEB, 0x3a5f2a, 0.5);
         scene.add(hemi);
 
-        // --- Земля (поляна) ---
+        // --- Земля ---
         const groundGeo = new THREE.PlaneGeometry(18, 18);
         const groundMat = new THREE.MeshStandardMaterial({ color: 0x5d8c4a, roughness: 0.9 });
         const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -241,7 +249,7 @@
         ground.receiveShadow = true;
         scene.add(ground);
 
-        // --- Создание сетки полей ---
+        // --- Создание сетки ---
         function createGrid() {
             const gridGroup = new THREE.Group();
             const cellMeshes = [];
@@ -251,7 +259,6 @@
                     const x = j * CELL_SIZE - OFFSET;
                     const z = i * CELL_SIZE - OFFSET;
 
-                    // Поле (грядка)
                     const boxGeo = new THREE.BoxGeometry(CELL_SIZE * 0.9, 0.3, CELL_SIZE * 0.9);
                     const boxMat = new THREE.MeshStandardMaterial({ 
                         color: 0x6b8f4a, 
@@ -265,14 +272,12 @@
                     box.castShadow = true;
                     gridGroup.add(box);
 
-                    // Рамка (бортик)
                     const edgeGeo = new THREE.EdgesGeometry(boxGeo);
                     const edgeMat = new THREE.LineBasicMaterial({ color: 0xad9a5a });
                     const edge = new THREE.LineSegments(edgeGeo, edgeMat);
                     edge.position.copy(box.position);
                     gridGroup.add(edge);
 
-                    // Сохраняем данные
                     const cellData = {
                         stage: 0,
                         timer: null,
@@ -293,7 +298,7 @@
         function createPlantMesh(stage) {
             const group = new THREE.Group();
             
-            if (stage === 1) { // росток
+            if (stage === 1) {
                 const stemGeo = new THREE.CylinderGeometry(0.08, 0.12, 0.7);
                 const stemMat = new THREE.MeshStandardMaterial({ color: 0x6a994e });
                 const stem = new THREE.Mesh(stemGeo, stemMat);
@@ -313,7 +318,7 @@
                 leaf2.position.set(-0.2, 0.6, -0.1);
                 leaf2.scale.set(0.8, 0.4, 0.8);
                 group.add(leaf2);
-            } else if (stage === 2) { // созревшее (с колосьями)
+            } else if (stage === 2) {
                 const stemGeo = new THREE.CylinderGeometry(0.1, 0.15, 0.9);
                 const stemMat = new THREE.MeshStandardMaterial({ color: 0x7a9c5a });
                 const stem = new THREE.Mesh(stemGeo, stemMat);
@@ -321,7 +326,6 @@
                 stem.castShadow = true;
                 group.add(stem);
 
-                // колосья (золотистые шарики)
                 for (let k = 0; k < 6; k++) {
                     const angle = (k / 6) * Math.PI * 2;
                     const r = 0.25;
@@ -333,7 +337,6 @@
                     grain.castShadow = true;
                     group.add(grain);
                 }
-                // дополнительный колосок
                 const top = new THREE.Mesh(
                     new THREE.SphereGeometry(0.18, 5),
                     new THREE.MeshStandardMaterial({ color: 0xeac54a, emissive: new THREE.Color(0x7a5d1a), emissiveIntensity: 0.2 })
@@ -345,11 +348,7 @@
             return group;
         }
 
-        // --- Инициализация ---
-        const cellDataArray = createGrid();
-        cells = cellDataArray;
-
-        // Добавим вспомогательные объекты (деревья, траву)
+        // --- Декор ---
         function addDecor() {
             const treeMat = new THREE.MeshStandardMaterial({ color: 0x4d7a3a });
             const trunkMat = new THREE.MeshStandardMaterial({ color: 0x6b4f2e });
@@ -368,7 +367,6 @@
                 crown.castShadow = true;
                 scene.add(crown);
             }
-            // трава
             const grassMat = new THREE.MeshStandardMaterial({ color: 0x5d874a });
             for (let i = 0; i < 60; i++) {
                 const x = (Math.random() - 0.5) * 16;
@@ -382,15 +380,16 @@
         }
         addDecor();
 
-        // --- Обновление 3D сцены в соответствии с состоянием ---
+        // --- Инициализация ---
+        cells = createGrid();
+
+        // --- Обновление сцены ---
         function updateScene() {
             cells.forEach((cell, idx) => {
-                // Удаляем старое растение
                 if (cell.plantMesh) {
                     scene.remove(cell.plantMesh);
                     cell.plantMesh = null;
                 }
-                // Удаляем старую метку
                 if (cell.label) {
                     scene.remove(cell.label);
                     cell.label = null;
@@ -403,14 +402,13 @@
                     scene.add(plant);
                     cell.plantMesh = plant;
 
-                    // Добавляем таймер (CSS2D) для стадии 1
                     if (cell.stage === 1 && cell.timer) {
                         const remaining = Math.max(0, (cell.timer - Date.now()));
                         const secs = Math.ceil(remaining / 1000);
                         const div = document.createElement('div');
                         div.textContent = `⏳ ${secs}s`;
                         div.style.color = '#f5f0b0';
-                        div.style.fontSize = '18px';
+                        div.style.fontSize = 'clamp(16px, 3vw, 22px)';
                         div.style.fontWeight = 'bold';
                         div.style.textShadow = '0 2px 12px black';
                         div.style.background = 'rgba(0,0,0,0.5)';
@@ -424,12 +422,11 @@
                     }
                 }
             });
-            // обновляем счетчики
             coinSpan.textContent = coins;
             levelSpan.textContent = level;
         }
 
-        // --- Проверка роста (таймеры) ---
+        // --- Проверка роста ---
         function checkGrowth() {
             let changed = false;
             const now = Date.now();
@@ -441,35 +438,30 @@
                     messageEl.textContent = `🌾 Ячейка ${idx+1} созрела! Соберите.`;
                 }
             });
-            if (changed) {
-                updateScene();
-                // также обновляем таймеры на этикетках
-            }
+            if (changed) updateScene();
         }
 
-        // --- Raycaster для выбора клетки ---
-        function getIntersectedCell(event) {
+        // --- Получение клетки по клику/тапу ---
+        function getIntersectedCell(clientX, clientY) {
             const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
+            touchPos.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+            touchPos.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(touchPos, camera);
 
             const meshes = cells.map(c => c.mesh);
             const intersects = raycaster.intersectObjects(meshes);
             if (intersects.length > 0) {
                 const hitMesh = intersects[0].object;
                 for (let i = 0; i < cells.length; i++) {
-                    if (cells[i].mesh === hitMesh) {
-                        return i;
-                    }
+                    if (cells[i].mesh === hitMesh) return i;
                 }
             }
             return null;
         }
 
-        // --- Обработчики кликов по сцене (выбор) ---
-        renderer.domElement.addEventListener('click', (event) => {
-            const idx = getIntersectedCell(event);
+        // --- Обработчики для мыши и тач ---
+        function handleSelect(clientX, clientY) {
+            const idx = getIntersectedCell(clientX, clientY);
             if (idx !== null) {
                 selectedIndex = idx;
                 const cell = cells[idx];
@@ -480,26 +472,35 @@
                     msg += ` (осталось ${Math.ceil(remain/1000)}с)`;
                 }
                 messageEl.textContent = `👉 ${msg}`;
-                // Подсветка
                 cells.forEach((c, i) => {
                     c.mesh.material.emissive.setHex(i === idx ? 0x665522 : 0x2a401a);
                     c.mesh.material.emissiveIntensity = i === idx ? 0.5 : 0.1;
                 });
             } else {
-                // Снять выделение
                 selectedIndex = null;
                 cells.forEach(c => {
                     c.mesh.material.emissive.setHex(0x2a401a);
                     c.mesh.material.emissiveIntensity = 0.1;
                 });
-                messageEl.textContent = '🌾 Наведись на клетку и кликни для выбора';
+                messageEl.textContent = '🌾 Нажми на грядку для выбора';
             }
+        }
+
+        // --- События ---
+        renderer.domElement.addEventListener('click', (e) => {
+            handleSelect(e.clientX, e.clientY);
         });
+
+        renderer.domElement.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.changedTouches[0];
+            if (touch) handleSelect(touch.clientX, touch.clientY);
+        }, { passive: false });
 
         // --- Действия ---
         function plantAction() {
             if (selectedIndex === null) {
-                messageEl.textContent = '⚠️ Сначала кликни на пустую клетку!';
+                messageEl.textContent = '⚠️ Сначала нажми на пустую грядку!';
                 return;
             }
             const idx = selectedIndex;
@@ -509,22 +510,21 @@
                 return;
             }
             if (coins < PLANT_COST) {
-                messageEl.textContent = `💸 Не хватает монет! Нужно ${PLANT_COST}`;
+                messageEl.textContent = `💸 Нужно ${PLANT_COST} монет!`;
                 return;
             }
             coins -= PLANT_COST;
             cell.stage = 1;
             cell.timer = Date.now() + GROW_TIME;
-            messageEl.textContent = `🌱 Посажено! Жди ${GROW_TIME/1000} секунд.`;
+            messageEl.textContent = `🌱 Посажено! Жди ${GROW_TIME/1000}с.`;
             updateScene();
-            // убираем подсветку
             cells.forEach(c => { c.mesh.material.emissive.setHex(0x2a401a); c.mesh.material.emissiveIntensity = 0.1; });
             selectedIndex = null;
         }
 
         function harvestAction() {
             if (selectedIndex === null) {
-                messageEl.textContent = '⚠️ Кликни на созревшую клетку!';
+                messageEl.textContent = '⚠️ Нажми на созревшую грядку!';
                 return;
             }
             const idx = selectedIndex;
@@ -536,8 +536,7 @@
             coins += HARVEST_REWARD;
             cell.stage = 0;
             cell.timer = null;
-            messageEl.textContent = `🧺 Собрано! +${HARVEST_REWARD} 🪙`;
-            // уровень
+            messageEl.textContent = `🧺 +${HARVEST_REWARD} 🪙`;
             const newLevel = Math.floor(coins / 50) + 1;
             if (newLevel > level) {
                 level = newLevel;
@@ -560,23 +559,23 @@
             coins = 20;
             level = 1;
             selectedIndex = null;
-            messageEl.textContent = '🔄 Ферма сброшена. Начинай заново!';
+            messageEl.textContent = '🔄 Ферма сброшена';
             updateScene();
         }
 
-        // --- Подключение кнопок ---
         document.getElementById('plantBtn').addEventListener('click', plantAction);
+        document.getElementById('plantBtn').addEventListener('touchstart', (e) => { e.preventDefault(); plantAction(); }, { passive: false });
         document.getElementById('harvestBtn').addEventListener('click', harvestAction);
+        document.getElementById('harvestBtn').addEventListener('touchstart', (e) => { e.preventDefault(); harvestAction(); }, { passive: false });
         document.getElementById('resetBtn').addEventListener('click', resetFarm);
+        document.getElementById('resetBtn').addEventListener('touchstart', (e) => { e.preventDefault(); resetFarm(); }, { passive: false });
 
-        // --- Цикл обновления ---
+        // --- Циклы ---
         setInterval(() => {
             checkGrowth();
-            // обновляем таймеры на этикетках (пересоздаём)
             updateScene();
         }, 1000);
 
-        // --- Анимация ---
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
@@ -587,16 +586,16 @@
 
         // --- Resize ---
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            camera.aspect = w / h;
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(w, h);
+            labelRenderer.setSize(w, h);
         });
 
-        // Стартовое обновление
         updateScene();
-        messageEl.textContent = '🌾 Кликни на клетку для выбора, затем сажай или собирай!';
-
+        messageEl.textContent = '🌾 Нажми на грядку, затем кнопку';
     </script>
 </body>
 </html>
